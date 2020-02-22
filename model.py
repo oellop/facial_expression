@@ -17,20 +17,46 @@ train = []
 label = []
 
 
-def read_dir(path, label):
-    list = [f for f in os.listdir(path) if f.endswith('.png')]
-    train = []
-    for i in list:
-        img1 = cv2.imread(path + i)
-        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-        img1 = img1 / 255.0
-        img1 = np.reshape(img1, 48*48)
-        train = np.concatenate((train, img1), axis=0)
+def data_prep_CK1():
+    path = "CK\\CK+48"
+    train_images = np.empty([1,48*48])
+    test_images= np.empty([1, 48*48])
+    train_labels,test_labels=[],[]
+    folder = [f for f in os.listdir(path)]
+    label = 0
 
-    train = train.reshape(len(list), 48*48)
+    for f in folder :
+        print(f)
 
-    label = np.ones(len(list))*label
-    return train, label
+        image_list = [im for im in os.listdir(path + "\\" + f) if im.endswith('.png')]
+        pack = []
+
+        for i in image_list:
+            img1 = cv2.imread(path + "\\" + f + "\\" + i)
+            img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+            img1 = img1 / 255.0
+            img1 = np.reshape(img1, 48*48)
+            pack = np.concatenate((pack, img1), axis=0)
+
+        pack = pack.reshape(len(image_list), 48*48)
+        train = pack[0:int(np.floor(len(pack)*0.8)), :]
+        test  = pack[int(np.ceil(len(pack)*0.8)):, :]
+        train = train.reshape(len(train), 48*48)
+
+        train_images = np.concatenate((train_images, train), axis = 0)
+        test_images  = np.concatenate((test_images, test), axis = 0)
+        train_labels = np.concatenate((train_labels, np.ones(len(train))*label))
+        test_labels  = np.concatenate((test_labels, np.ones(len(test))*label))
+        label = label + 1
+
+    train_images = train_images[1:, :]
+    test_images  = test_images[1:, :]
+
+
+    train_images, train_labels = shuffle(train_images, train_labels)
+    test_images, test_labels = shuffle(test_images, test_labels)
+    print(train_labels.shape)
+    return train_images, train_labels, test_images, test_labels
 
 def data_prep_fer():
     df=pd.read_csv('fer2013\\fer2013.csv')
@@ -55,31 +81,6 @@ def data_prep_fer():
     # test_images -= np.mean(test_images, axis=0)
     # test_images /= np.std(test_images, axis=0)
     test_images  = test_images/255
-
-    train_images, train_labels = shuffle(train_images, train_labels)
-    test_images, test_labels = shuffle(test_images, test_labels)
-
-    return train_images, train_labels, test_images, test_labels
-
-
-def data_prep_CK():
-    path = 'CK\\CK+48\\'
-    happy, label_h = read_dir(path + 'happy\\', 0)
-    happy = shuffle(happy)
-    sad, label_sad = read_dir(path + 'sadness\\', 1)
-    sad = shuffle(sad)
-    surprise, label_surp = read_dir(path + 'surprise\\', 2)
-    surprise = shuffle(surprise)
-
-
-
-
-    train_images = np.concatenate((happy[0:150,:], sad[0:49,:], surprise[0:155,:]), axis=0)
-    train_labels = np.concatenate((label_h[0:150], label_sad[0:49], label_surp[0:155]))
-
-
-    test_images = np.concatenate((happy[101:,:], sad[50:,:], surprise[156:,:]), axis=0)
-    test_labels = np.concatenate((label_h[101:], label_sad[50:], label_surp[156:]))
 
     train_images, train_labels = shuffle(train_images, train_labels)
     test_images, test_labels = shuffle(test_images, test_labels)
@@ -163,46 +164,7 @@ def train_cnn():
     return 1
 
 
-def data_prep_CK1():
-    path = "CK\\CK+48"
-    train_images = np.empty([1,48*48])
-    test_images= np.empty([1, 48*48])
-    train_labels,test_labels=[],[]
-    folder = [f for f in os.listdir(path)]
-    label = 0
 
-    for f in folder :
-        print(f)
-
-        image_list = [im for im in os.listdir(path + "\\" + f) if im.endswith('.png')]
-        pack = []
-
-        for i in image_list:
-            img1 = cv2.imread(path + "\\" + f + "\\" + i)
-            img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-            img1 = img1 / 255.0
-            img1 = np.reshape(img1, 48*48)
-            pack = np.concatenate((pack, img1), axis=0)
-
-        pack = pack.reshape(len(image_list), 48*48)
-        train = pack[0:int(np.floor(len(pack)*0.8)), :]
-        test  = pack[int(np.ceil(len(pack)*0.8)):, :]
-        train = train.reshape(len(train), 48*48)
-
-        train_images = np.concatenate((train_images, train), axis = 0)
-        test_images  = np.concatenate((test_images, test), axis = 0)
-        train_labels = np.concatenate((train_labels, np.ones(len(train))*label))
-        test_labels  = np.concatenate((test_labels, np.ones(len(test))*label))
-        label = label + 1
-
-    train_images = train_images[1:, :]
-    test_images  = test_images[1:, :]
-
-
-    train_images, train_labels = shuffle(train_images, train_labels)
-    test_images, test_labels = shuffle(test_images, test_labels)
-    print(train_labels.shape)
-    return train_images, train_labels, test_images, test_labels
 
 #
 # train_images, train_labels, test_images, test_labels = data_prep_CK1()
