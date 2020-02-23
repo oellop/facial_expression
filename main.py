@@ -9,19 +9,20 @@ import time
 import tensorflow as tf
 import keras
 
-from facial_expression import data_prep_CK1
-# match = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
+from model import data_prep_CK1
+
+match = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
 # match = {0: 'happy', 1:'sad', 2:'surprise' }
-match = ('angry', 'contempt', 'disgust', 'fear', 'happy', 'sad', 'surprise')
-json_file = open('model.json', 'r')
+# match = ('angry', 'contempt', 'disgust', 'fear', 'happy', 'sad', 'surprise')
+json_file = open('fer.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 loaded_model = model_from_json(loaded_model_json)
 # load weights into new model
-loaded_model.load_weights("model.h5")
+loaded_model.load_weights("fer.h5")
 
 loaded_model.compile(optimizer='adam',
-              loss='binary_crossentropy',
+              loss='categorical_crossentropy',
               metrics=['accuracy'])
 loaded_model.summary()
 
@@ -97,16 +98,21 @@ def test_on_dataset():
     print(train_labels)
     for i in range(10):
         img = train_images[i]
+
         plt.imshow(img.reshape(48,48))
-        # print(match[train_labels[i]])
-        img = img/255.0
+
         img = np.resize(img, (48,48))
+
         img = img.reshape(48,48, 1)
 
+        # img = img/255.0
+
         predictions = loaded_model.predict(np.array([img]))
+        # print(np.array([img]))
         print(predictions)
         print(match[np.argmax(predictions[0])])
+        plt.title(match[np.argmax(predictions[0])])
         plt.show()
         cv2.waitKey(0)
 
-test_webcam()
+test_on_dataset()
