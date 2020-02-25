@@ -75,9 +75,9 @@ def data_prep_fer():
     train_images = np.array(train_images,'float32')
 
 
-    train_images = train_images/255
+    train_images = train_images/255.0
     test_images  = np.array(test_images,'float32')
-    test_images  = test_images/255
+    test_images  = test_images/255.0
 
     train_images, train_labels = shuffle(train_images, train_labels)
     test_images, test_labels = shuffle(test_images, test_labels)
@@ -101,24 +101,24 @@ def create_model_cnn(train_images, num_labels):
 
     print(train_images.shape[1:])
 
-    model.add(Conv2D(128, (3, 3), activation='relu', input_shape=(train_images.shape[1:])))
+    model.add(Conv2D(32, (1, 1), activation='relu', input_shape=(train_images.shape[1:])))
     # model.add(Dropout(0.2))
-    model.add(Conv2D(128, (3, 3), activation='relu'))
+    model.add(Conv2D(32, (1, 1), activation='relu'))
 
     model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2)))
     # model.add(Dropout(0.2))
 
     #2nd convolution layer
-    model.add(Conv2D(256, (3, 3), activation='relu'))
-    model.add(Conv2D(256, (3, 3), activation='relu'))
-    # model.add(Conv2D(256, (3, 3), activation='relu'))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2)))
     model.add(Dropout(0.2))
 
     # #3rd convolution layer
-    model.add(Conv2D(512, (3, 3), activation='relu'))
-    model.add(Conv2D(512, (3, 3), activation='relu'))
-    # model.add(Conv2D(512, (3, 3), activation='relu'))
+    model.add(Conv2D(256, (3, 3), activation='relu'))
+    model.add(Conv2D(256, (3, 3), activation='relu'))
+    model.add(Conv2D(256, (3, 3), activation='relu'))
 
     model.add(MaxPooling2D(pool_size=(2,2), strides=(2, 2)))
 
@@ -134,7 +134,7 @@ def create_model_cnn(train_images, num_labels):
     model.add(Dense(1024, activation='relu'))
     # model.add(Dropout(0.2))
     model.add(Dense(1024, activation='relu'))
-    model.add(Dense(512, activation= 'relu'))
+    # model.add(Dense(512, activation= 'relu'))
     model.add(Dropout(0.2))
 
     model.add(Dense(num_labels, activation='softmax'))
@@ -143,7 +143,7 @@ def create_model_cnn(train_images, num_labels):
 
 
 def train_cnn():
-    train_images, train_labels, test_images, test_labels = data_prep_fer()
+    train_images, train_labels, test_images, test_labels = data_prep_CK1()
     train_labels =  keras.utils.to_categorical(train_labels, 7)
     test_labels  =  keras.utils.to_categorical(test_labels, 7)
     # img = train_images[7].reshape(48, 48)
@@ -160,10 +160,10 @@ def train_cnn():
     test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 
     model_json = model.to_json()
-    with open("fer.json", "w") as json_file:
+    with open("model.json", "w") as json_file:
         json_file.write(model_json)
 
-    model.save_weights("fer.h5")
+    model.save_weights("model.h5")
     print('\nTest accuracy:', test_acc)
 
     return 1
@@ -173,4 +173,4 @@ def train_cnn():
 
 #
 # train_images, train_labels, test_images, test_labels = data_prep_CK1()
-train_cnn()
+# train_cnn()
