@@ -60,7 +60,7 @@ def frame_face_with_haar(img, scaleFactor=1.1, minNeigh=5):
     for (x, y ,w, h) in faces:
         # cv2.rectangle(img, (x, y) , (x+w, y+h), (0, 255, 0), 2 )
         img=replace_face(img, x, y, w, h, expression(gray[y:y+h, x:x+w]))
-        
+
     return img
 
 def frame_face_with_mcnn(img):
