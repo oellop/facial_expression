@@ -7,6 +7,8 @@ This project aims to detect emotions on faces. First it detects faces with haarc
 
 Simonyan, Karen and Andrew Zisserman. "Very Deep Convolutional Networks for Large-Scale Image Recognition." arXiv, 4 Sept. 2014, arxiv.org/abs/1409.1556.
 
+Goodfellow, Ian J., et al. "Challenges in Representation Learning: A report on three machine learning contests." arXiv, 1 July 2013, arxiv.org/abs/1307.0414.
+
 ## SOURCES 
 
 FER 2013 dataset :
